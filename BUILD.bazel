@@ -1,0 +1,16 @@
+cc_library(
+    name = "raylib",
+    hdrs = glob(["vendor/raylib/include/*.h"]),
+    includes = ["vendor/raylib/include"],
+    srcs = ["vendor/raylib/lib/raylib.lib"],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "windows_binary",
+    srcs = ["src/main.c"],
+    deps = [
+        "//platform:win_deps",
+        ":raylib",
+    ],
+)
