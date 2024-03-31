@@ -31,7 +31,7 @@ def analyze_code(directory):
         for file in files:
             filepath = os.path.join(root, file)
             current_sloc = 0
-            if ".cpp" in filepath:
+            if ".cpp" in filepath or ".c" in filepath:
                 total_srcs += 1
             if ".h" in filepath:
                 total_hdrs += 1
