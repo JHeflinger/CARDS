@@ -1,0 +1,1 @@
+bazel run linux_binary

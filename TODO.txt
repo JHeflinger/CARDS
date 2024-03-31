@@ -1,0 +1,11 @@
+MINOR:
+    - tbd
+
+MEDIUM:
+    - tbd
+
+MAJOR:
+    - tbd
+
+COMPLETED:
+    - tbd
