@@ -1,9 +1,17 @@
 cc_library(
-    name = "raylib",
+    name = "win_raylib",
     hdrs = glob(["vendor/raylib/include/*.h"]),
     includes = ["vendor/raylib/include"],
     srcs = ["vendor/raylib/lib/raylib.lib"],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+	name = "lin_raylib",
+	hdrs = glob(["vendor/raylib/include/*.h"]),
+	includes = ["vendor/raylib/include"],
+	srcs = ["vendor/raylib/lib/libraylib.a"],
+	visibility = ["//visibility:public"],
 )
 
 cc_binary(
@@ -11,6 +19,14 @@ cc_binary(
     srcs = ["src/main.c"],
     deps = [
         "//platform:win_deps",
-        ":raylib",
+        ":win_raylib",
     ],
+)
+
+cc_binary(
+	name = "linux_binary",
+	srcs = ["src/main.c"],
+	deps = [
+		":lin_raylib",
+	],
 )
