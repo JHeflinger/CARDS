@@ -14,12 +14,32 @@ cc_library(
 	visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "win_game_lib",
+    includes = ["src"],
+    srcs = glob(["src/**/*.c"]),
+    hdrs = glob(["src/**/*.h"]),
+    deps = [
+        "//platform:win_deps",
+        ":win_raylib",
+    ],
+)
+
+cc_library(
+    name = "lin_game_lib",
+    includes = ["src"],
+    srcs = glob(["src/**/*.c"]),
+    hdrs = glob(["src/**/*.h"]),
+	deps = [
+		":lin_raylib",
+	],
+)
+
 cc_binary(
     name = "windows_binary",
     srcs = ["src/main.c"],
     deps = [
-        "//platform:win_deps",
-        ":win_raylib",
+        ":win_game_lib"
     ],
 )
 
@@ -27,6 +47,6 @@ cc_binary(
 	name = "linux_binary",
 	srcs = ["src/main.c"],
 	deps = [
-		":lin_raylib",
+		":lin_game_lib",
 	],
 )
