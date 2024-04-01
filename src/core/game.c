@@ -4,9 +4,10 @@
 #include "core/logger.h"
 #include "raylib.h"
 
-GameState g_CurrentState = TITLE;
+GameState g_CurrentState = CORE;
 
 void RunGame() {
+	SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(800, 450, "CARDS");
     while (!WindowShouldClose()) ManageScenes();
     CloseWindow();
@@ -15,9 +16,11 @@ void RunGame() {
 void ManageScenes() {
     switch(g_CurrentState) {
         case TITLE:
+			UpdateStartScene();
             DrawStartScene();
             break;
         case CORE:
+			UpdateCoreScene();
             DrawCoreScene();
             break;
         default:

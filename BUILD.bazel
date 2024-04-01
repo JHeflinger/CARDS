@@ -1,27 +1,10 @@
 cc_library(
-    name = "win_raylib",
-    hdrs = glob(["vendor/raylib/include/*.h"]),
-    includes = ["vendor/raylib/include"],
-    srcs = ["vendor/raylib/lib/raylib.lib"],
-    visibility = ["//visibility:public"],
-)
-
-cc_library(
-	name = "lin_raylib",
-	hdrs = glob(["vendor/raylib/include/*.h"]),
-	includes = ["vendor/raylib/include"],
-	srcs = ["vendor/raylib/lib/libraylib.a"],
-	visibility = ["//visibility:public"],
-)
-
-cc_library(
     name = "win_game_lib",
     includes = ["src"],
     srcs = glob(["src/**/*.c"]),
     hdrs = glob(["src/**/*.h"]),
     deps = [
-        "//platform:win_deps",
-        ":win_raylib",
+        "//vendor:win_deps",
     ],
 )
 
@@ -31,7 +14,7 @@ cc_library(
     srcs = glob(["src/**/*.c"]),
     hdrs = glob(["src/**/*.h"]),
 	deps = [
-		":lin_raylib",
+		"//vendor:lin_deps",
 	],
 )
 

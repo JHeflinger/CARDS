@@ -9,3 +9,7 @@ void DrawStartScene() {
 
     EndDrawing();
 }
+
+void UpdateStartScene() {
+
+}

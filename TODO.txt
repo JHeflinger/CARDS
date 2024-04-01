@@ -1,11 +1,14 @@
 MINOR:
-    - tbd
+    - include easynet
 
 MEDIUM:
-    - tbd
+    - connect to client via start scene
+	- look into using both UDP and TCP connections
+	- have disconnection detection
 
 MAJOR:
-    - tbd
+    - implement start scene
+	- implement core scene
 
 COMPLETED:
-    - tbd
+	- basic setup
