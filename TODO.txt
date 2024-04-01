@@ -1,5 +1,5 @@
 MINOR:
-    - include easynet
+    - polish graphics
 
 MEDIUM:
     - connect to client via start scene
@@ -12,3 +12,5 @@ MAJOR:
 
 COMPLETED:
 	- basic setup
+	- include raylib
+	- include easynet
