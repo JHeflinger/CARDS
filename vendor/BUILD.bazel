@@ -17,9 +17,12 @@ cc_library(
 cc_library(
 	name = "win_deps",
 	deps = [
+		"//vendor/EasyNet:easynet",
 		"//platform:win_deps",
 		":win_raylib",
-		"//vendor/EasyNet:easynet",
+	],
+	linkopts = [
+		"-DEFAULTLIB:ws2_32.lib",
 	],
 	visibility = ["//visibility:public"],
 )
