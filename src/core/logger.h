@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LOGGER 
+#define LOGGER 
+
 #include <stdio.h>
 
 #define LOG_RESET "\033[0m"
@@ -16,3 +18,5 @@
 #define LOG_CUSTOM(precursor, ...) {printf("%s[%s]%s  ", LOG_CYAN, precursor, LOG_RESET);   printf(__VA_ARGS__); printf("\n");}
 #define LOG_SCAN(...)  {printf("%s[INPUT]%s ", LOG_PURPLE, LOG_RESET); scanf(__VA_ARGS__);}
 #define LOG_ASSERT(check, ...) {if (!check) LOG_FATAL(__VA_ARGS__);}
+
+#endif

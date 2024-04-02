@@ -9,6 +9,8 @@ MEDIUM:
 MAJOR:
     - implement start scene
 	- implement core scene
+		- basic 2 player movement
+		- expand to arbitrary # of players
 
 COMPLETED:
 	- basic setup

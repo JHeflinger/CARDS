@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME 
+#define GAME
 
 typedef enum {
     TITLE,
@@ -7,3 +8,5 @@ typedef enum {
 
 void RunGame();
 void ManageScenes();
+
+#endif

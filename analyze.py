@@ -27,45 +27,53 @@ def analyze_code(directory):
     total_structs = 0
     total_typedefs = 0
     total_includes = 0
+    total_lines = 0
     for root, dirs, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
             current_sloc = 0
+            good_file = False
             if ".cpp" in filepath or ".c" in filepath:
                 total_srcs += 1
+                good_file = True
             if ".h" in filepath:
                 total_hdrs += 1
+                good_file = True
             total_files += 1
-            with open(filepath, 'r') as file:
-                for line in file:
-                    if len(clean_sloc_line(line)) > 0:
-                        current_sloc += 1
-                    if len(line) > 6 and "struct" == line[0:6]:
-                        total_structs += 1
-                    if len(line) > 5 and "class" == line[0:5]:
-                        total_classes += 1
-                    if len(line) > 7 and "typedef" == line[0:7]:
-                        total_typedefs += 1
-                    if len(line) > 8 and "#include" == line[0:8]:
-                        total_includes += 1
+            if good_file:
+                with open(filepath, 'r') as file:
+                    for line in file:
+                        total_lines += 1
+                        if len(clean_sloc_line(line)) > 0:
+                            current_sloc += 1
+                        if len(line) > 6 and "struct" == line[0:6]:
+                            total_structs += 1
+                        if len(line) > 5 and "class" == line[0:5]:
+                            total_classes += 1
+                        if len(line) > 7 and "typedef" == line[0:7]:
+                            total_typedefs += 1
+                        if len(line) > 8 and "#include" == line[0:8]:
+                            total_includes += 1
             total_sloc += current_sloc
     return ("CODE ANALYSIS: \n" + 
             "┌──────────────────┬───────────────┐\n"
-            "│1. TOTAL SLOC     │" + pad_num(total_sloc) + "│\n" +
+            "│1. TOTAL LINES    │" + pad_num(total_lines) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│2. HEADER FILES   │" + pad_num(total_hdrs) + "│\n" +
+            "│2. TOTAL SLOC     │" + pad_num(total_sloc) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│3. SOURCE FILES   │" + pad_num(total_srcs) + "│\n" +
+            "│3. HEADER FILES   │" + pad_num(total_hdrs) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│4. TOTAL FILES    │" + pad_num(total_files) + "│\n" +
+            "│4. SOURCE FILES   │" + pad_num(total_srcs) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│5. STRUCTS        │" + pad_num(total_structs) + "│\n" +
+            "│5. TOTAL FILES    │" + pad_num(total_files) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│6. CLASSES        │" + pad_num(total_classes) + "│\n" +
+            "│6. STRUCTS        │" + pad_num(total_structs) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│7. TYPEDEFS       │" + pad_num(total_typedefs) + "│\n" +
+            "│7. CLASSES        │" + pad_num(total_classes) + "│\n" +
             "├──────────────────┼───────────────┤\n"
-            "│8. INCLUDES       │" + pad_num(total_includes) + "│\n" +
+            "│8. TYPEDEFS       │" + pad_num(total_typedefs) + "│\n" +
+            "├──────────────────┼───────────────┤\n"
+            "│9. INCLUDES       │" + pad_num(total_includes) + "│\n" +
             "└──────────────────┴───────────────┘\n")
 
 def analyze_progress():
@@ -120,9 +128,17 @@ def analyze_progress():
 
 
 print("Performing project analysis...")
-print("Analyzing SLOC...")
-statement += analyze_code("src") + "\n"
-statement += analyze_progress()
 
+print("Analyzing project code...")
+statement += analyze_code("src") + "\n"
+print("Finished analyzing project code!")
+
+print("Analyzing vendors...")
+statement += analyze_code("vendor") + "\n"
+print("Finished analyzing vendor code!")
+
+print("Analyzing progress...")
+statement += analyze_progress()
+print("Finished analyzing progress!")
 
 print(statement)

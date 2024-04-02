@@ -1,6 +1,7 @@
 #include "game.h"
 #include "scenes/startscene.h"
 #include "scenes/corescene.h"
+#include "utils/datastructs.h"
 #include "core/logger.h"
 #include "raylib.h"
 #include "easynet.h"
@@ -13,7 +14,7 @@ void RunGame() {
 
 	// initialize window
 	SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(800, 450, "CARDS");
+    InitWindow(1200, 675, "CARDS");
 
 	// main game loop
     while (!WindowShouldClose())
