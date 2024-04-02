@@ -9,3 +9,4 @@ typedef enum {
 void DrawCoreScene();
 void UpdateCoreScene();
 void InitializeCoreScene();
+void MainCoreScene();

@@ -14,7 +14,8 @@ void DrawCoreScene() {
     
 	BeginMode2D(g_Camera);
 
-	DrawRectangleRec({g_PlayerLocation.x, g_PlayerLocation.y, g_PlayerSize.x, g_PlayerSize.y}, GOLD);
+	Rectangle rec = {g_PlayerLocation.x, g_PlayerLocation.y, g_PlayerSize.x, g_PlayerSize.y};
+	DrawRectangleRec(rec, GOLD);
 
 	EndMode2D();
     
@@ -31,6 +32,7 @@ void UpdateCoreScene() {
 			InitializeCoreScene();
 			break;
 		case CORE_MAIN:
+			MainCoreScene();
 			break;
 		default:
 			LOG_FATAL("Unhandled core scene state detected");	
@@ -43,4 +45,24 @@ void InitializeCoreScene() {
     g_Camera.offset = (Vector2){ GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
     g_Camera.rotation = 0.0f;
     g_Camera.zoom = 1.0f;
+
+	// change state
+	g_State = CORE_MAIN;
+}
+
+void MainCoreScene() {
+	float ft = GetFrameTime();
+	float speed = 100;
+	if (IsKeyDown(KEY_W)) {
+		g_PlayerLocation.y -= speed*ft;
+	}
+	if (IsKeyDown(KEY_A)) {
+		g_PlayerLocation.x -= speed*ft;
+	}
+	if (IsKeyDown(KEY_S)) {
+		g_PlayerLocation.y += speed*ft;
+	}
+	if (IsKeyDown(KEY_D)) {
+		g_PlayerLocation.x += speed*ft;
+	}
 }
