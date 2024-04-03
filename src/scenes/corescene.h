@@ -1,7 +1,10 @@
 #ifndef CORESCENE 
 #define CORESCENE 
 
+#include "utils/datastructs.h"
 #include "easynet.h"
+
+#define DEFAULT_CORE_PORT 69421
 
 typedef enum {
 	CORE_NONE = 0,
@@ -19,6 +22,7 @@ typedef struct {
 	CoreNetworkDescriptor m_Descriptor;
 	ezn_Server* m_HostDevice;
 	ezn_Client* m_ClientDevice;
+	ARRLIST_EZN_SOCKET m_ConnectedDevices;
 } CoreNetworkObject;
 
 void DrawCoreScene();
@@ -27,5 +31,9 @@ void InitializeCoreScene();
 void MainCoreScene();
 void CoreDevTrace();
 void CoreBackupNetworkSetup();
+void UpdateCoreNetworkService();
+
+EZN_STATUS ConnectAsClient(ezn_Client* client, EZN_SOCKET serversock);
+EZN_STATUS HostAsServer(ezn_Server* server, EZN_SOCKET clientsock);
 
 #endif

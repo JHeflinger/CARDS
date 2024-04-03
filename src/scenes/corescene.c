@@ -48,6 +48,7 @@ void UpdateCoreScene() {
 			break;
 		case CORE_MAIN:
 			MainCoreScene();
+			UpdateCoreNetworkService();
 			break;
 		default:
 			LOG_FATAL("Unhandled core scene state detected");	
@@ -98,5 +99,40 @@ void CoreDevTrace() {
 }
 
 void CoreBackupNetworkSetup() {
-	
+	if (g_NetworkObject.m_HostDevice == NULL)
+		g_NetworkObject.m_HostDevice = calloc(1, sizeof(ezn_Server));
+	if (g_NetworkObject.m_ClientDevice == NULL)
+		g_NetworkObject.m_ClientDevice = calloc(1, sizeof(ezn_Client));
+	uint8_t address[4];
+	ezn_set_ipv4_addr(address, 127, 0, 0, 1);
+	if (ezn_configure_client(g_NetworkObject.m_ClientDevice, DEFAULT_CORE_PORT, address) == EZN_ERROR) {
+		LOG_FATAL("Unable to set up client configuration");
+	} else if (ezn_connect_client(g_NetworkObject.m_ClientDevice, ConnectAsClient) == EZN_ERROR) {
+		LOG_WARN("Unable to connect to a local server - starting local server instead");
+		if (ezn_generate_server(g_NetworkObject.m_HostDevice, DEFAULT_CORE_PORT) == EZN_ERROR)
+			LOG_FATAL("Unable to generate server device");
+		if (ezn_open_server(g_NetworkObject.m_HostDevice) == EZN_ERROR)
+			LOG_FATAL("Unable to open local server");
+		LOG_WARN("Implicitly starting server via backup network setup");
+		g_NetworkObject.m_Descriptor = CORE_IS_HOST;
+		if (ezn_server_accept(g_NetworkObject.m_HostDevice, HostAsServer) == EZN_ERROR) {
+			LOG_FATAL("Unable to accept connections while hosting");
+		}
+	}
+}
+
+void UpdateCoreNetworkService() {
+
+}
+
+EZN_STATUS ConnectAsClient(ezn_Client* client, EZN_SOCKET serversock) {
+	LOG_WARN("Implicitly connecting as client via backup network setup");
+	g_NetworkObject.m_Descriptor = CORE_IS_CLIENT;
+
+	return EZN_NONE;
+}
+
+EZN_STATUS HostAsServer(ezn_Server* server, EZN_SOCKET clientsock) {
+
+	return EZN_NONE;
 }

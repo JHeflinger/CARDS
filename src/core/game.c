@@ -1,7 +1,6 @@
 #include "game.h"
 #include "scenes/startscene.h"
 #include "scenes/corescene.h"
-#include "utils/datastructs.h"
 #include "core/logger.h"
 #include "raylib.h"
 #include "easynet.h"

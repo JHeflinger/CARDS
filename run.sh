@@ -1,1 +1,2 @@
-bazel run linux_binary
+bazel build linux_binary
+./bazel-bin/linux_binary
