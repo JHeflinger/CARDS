@@ -1,3 +1,3 @@
 @echo off
 bazel build windows_binary
-"bazel-bin/windows_binary.exe"
+start bazel-bin/windows_binary.exe

@@ -8,6 +8,9 @@ Camera2D              g_Camera             = { 0 };
 Vector2               g_PlayerLocation     = { 0 };
 Vector2               g_PlayerSize         = { 20.0f, 20.0f };
 
+// temp
+Vector2               g_EnemyLocation      = { 0 };
+
 void DrawCoreScene() {
     BeginDrawing();
 
@@ -30,6 +33,9 @@ void DrawCoreScene() {
 	Rectangle rec = {g_PlayerLocation.x, g_PlayerLocation.y, g_PlayerSize.x, g_PlayerSize.y};
 	DrawRectangleRec(rec, GOLD);
 
+	Rectangle rec2 = { g_EnemyLocation.x, g_EnemyLocation.y, g_PlayerSize.x, g_PlayerSize.y};
+	DrawRectangleRec(rec2, RED);
+
 	EndMode2D();
 
 	CoreDevTrace();
@@ -47,6 +53,7 @@ void UpdateCoreScene() {
 			InitializeCoreScene();
 			break;
 		case CORE_MAIN:
+			CheckCoreNetworkService();
 			MainCoreScene();
 			UpdateCoreNetworkService();
 			break;
@@ -115,24 +122,70 @@ void CoreBackupNetworkSetup() {
 			LOG_FATAL("Unable to open local server");
 		LOG_WARN("Implicitly starting server via backup network setup");
 		g_NetworkObject.m_Descriptor = CORE_IS_HOST;
-		if (ezn_server_accept(g_NetworkObject.m_HostDevice, HostAsServer) == EZN_ERROR) {
+		if (ezn_server_accept(g_NetworkObject.m_HostDevice, HostAsServer, EZN_FALSE) == EZN_ERROR) {
 			LOG_FATAL("Unable to accept connections while hosting");
 		}
 	}
 }
 
-void UpdateCoreNetworkService() {
+void CheckCoreNetworkService() {
+	// temp 
+	if (g_NetworkObject.m_ConnectedDevices.size > 0) {
+		size_t validation_len;
+		EZN_BYTE buff[8];
+		if (ezn_ask(ARRLIST_EZN_SOCKET_get(&(g_NetworkObject.m_ConnectedDevices), 0), buff, 8, &validation_len) == EZN_ERROR) {
+			LOG_FATAL("error while asking for network packets!");
+		}
+		if ((int)validation_len > 0) {
+			g_EnemyLocation.x = *((float*)buff);
+			g_EnemyLocation.y = *((float*)(buff + 4));
+		}
+	} else {
+		LOG_FATAL("No server available!");
+	}
 
+	switch(g_NetworkObject.m_Descriptor) {
+		case CORE_IS_CLIENT:
+			break;
+		case CORE_IS_HOST:
+			break;
+		default:
+			LOG_FATAL("Invalid network status - cannot update network service");
+	}
+}
+
+void UpdateCoreNetworkService() {
+	// temp 
+	if (g_NetworkObject.m_ConnectedDevices.size > 0) {
+		size_t validation_len;
+		EZN_BYTE buff[8];
+		memcpy(buff, &g_PlayerLocation.x, 4);
+		memcpy(buff + 4, &g_PlayerLocation.y, 4);
+		if (ezn_send(ARRLIST_EZN_SOCKET_get(&(g_NetworkObject.m_ConnectedDevices), 0), buff, 8, &validation_len) == EZN_ERROR) {
+			LOG_FATAL("unable to send bytes!");
+		}
+	} else {
+		LOG_FATAL("No server available!");
+	}
+
+	switch(g_NetworkObject.m_Descriptor) {
+		case CORE_IS_CLIENT:
+			break;
+		case CORE_IS_HOST:
+			break;
+		default:
+			LOG_FATAL("Invalid network status - cannot update network service");
+	}
 }
 
 EZN_STATUS ConnectAsClient(ezn_Client* client, EZN_SOCKET serversock) {
 	LOG_WARN("Implicitly connecting as client via backup network setup");
 	g_NetworkObject.m_Descriptor = CORE_IS_CLIENT;
-
+	ARRLIST_EZN_SOCKET_add(&(g_NetworkObject.m_ConnectedDevices), serversock);
 	return EZN_NONE;
 }
 
 EZN_STATUS HostAsServer(ezn_Server* server, EZN_SOCKET clientsock) {
-
+	ARRLIST_EZN_SOCKET_add(&(g_NetworkObject.m_ConnectedDevices), clientsock);
 	return EZN_NONE;
 }

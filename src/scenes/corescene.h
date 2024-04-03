@@ -4,7 +4,7 @@
 #include "utils/datastructs.h"
 #include "easynet.h"
 
-#define DEFAULT_CORE_PORT 69421
+#define DEFAULT_CORE_PORT 6969
 
 typedef enum {
 	CORE_NONE = 0,
@@ -31,6 +31,7 @@ void InitializeCoreScene();
 void MainCoreScene();
 void CoreDevTrace();
 void CoreBackupNetworkSetup();
+void CheckCoreNetworkService();
 void UpdateCoreNetworkService();
 
 EZN_STATUS ConnectAsClient(ezn_Client* client, EZN_SOCKET serversock);
