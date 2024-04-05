@@ -1,6 +1,7 @@
 MINOR:
     - polish graphics
 	- smooth camera binding
+	- network speed monitor
 
 MEDIUM:
     - connect to client via start scene
