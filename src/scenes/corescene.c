@@ -1,5 +1,6 @@
 #include "corescene.h"
 #include "core/logger.h"
+#include "utils/timeutils.h"
 #include "raylib.h"
 
 CoreSceneState        g_State              = CORE_NONE;
@@ -10,6 +11,7 @@ Vector2               g_PlayerSize         = { 20.0f, 20.0f };
 
 // temp
 Vector2               g_EnemyLocation      = { 0 };
+uint32_t               g_Ping               = -1;
 
 void DrawCoreScene() {
     BeginDrawing();
@@ -103,6 +105,8 @@ void CoreDevTrace() {
 	char buffer[1024];
 	sprintf(buffer, "FPS: %d", (int)(1.0f/GetFrameTime()));
 	DrawText(buffer, 10, 10, 18, RAYWHITE);
+	sprintf(buffer, "PING: %u", g_Ping);
+	DrawText(buffer, 10, 30, 18, RAYWHITE);
 }
 
 void CoreBackupNetworkSetup() {
@@ -132,13 +136,14 @@ void CheckCoreNetworkService() {
 	// temp 
 	if (g_NetworkObject.m_ConnectedDevices.size > 0) {
 		size_t validation_len;
-		EZN_BYTE buff[8];
-		if (ezn_ask(ARRLIST_EZN_SOCKET_get(&(g_NetworkObject.m_ConnectedDevices), 0), buff, 8, &validation_len) == EZN_ERROR) {
+		EZN_BYTE buff[12];
+		if (ezn_ask(ARRLIST_EZN_SOCKET_get(&(g_NetworkObject.m_ConnectedDevices), 0), buff, 12, &validation_len) == EZN_ERROR) {
 			LOG_FATAL("error while asking for network packets!");
 		}
 		if ((int)validation_len > 0) {
 			g_EnemyLocation.x = *((float*)buff);
 			g_EnemyLocation.y = *((float*)(buff + 4));
+			g_Ping = GetUnpreciseEpoch() - *((uint32_t*)(buff + 8));
 		}
 	} else {
 		LOG_FATAL("No server available!");
@@ -158,10 +163,12 @@ void UpdateCoreNetworkService() {
 	// temp 
 	if (g_NetworkObject.m_ConnectedDevices.size > 0) {
 		size_t validation_len;
-		EZN_BYTE buff[8];
+		EZN_BYTE buff[12];
+		uint32_t currtime = GetUnpreciseEpoch();
 		memcpy(buff, &g_PlayerLocation.x, 4);
 		memcpy(buff + 4, &g_PlayerLocation.y, 4);
-		if (ezn_send(ARRLIST_EZN_SOCKET_get(&(g_NetworkObject.m_ConnectedDevices), 0), buff, 8, &validation_len) == EZN_ERROR) {
+		memcpy(buff + 8, &currtime, 4);
+		if (ezn_send(ARRLIST_EZN_SOCKET_get(&(g_NetworkObject.m_ConnectedDevices), 0), buff, 12, &validation_len) == EZN_ERROR) {
 			LOG_FATAL("unable to send bytes!");
 		}
 	} else {
