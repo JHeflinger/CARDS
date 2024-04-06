@@ -3,6 +3,8 @@
 #include "utils/timeutils.h"
 #include "raylib.h"
 
+#define DEBUG_SINGLEPLAYER
+
 CoreSceneState        g_State              = CORE_NONE;
 CoreNetworkObject     g_NetworkObject      = { 0 };
 Camera2D              g_Camera             = { 0 };
@@ -55,9 +57,13 @@ void UpdateCoreScene() {
 			InitializeCoreScene();
 			break;
 		case CORE_MAIN:
+			#ifndef DEBUG_SINGLEPLAYER
 			CheckCoreNetworkService();
+			#endif
 			MainCoreScene();
+			#ifndef DEBUG_SINGLEPLAYER
 			UpdateCoreNetworkService();
+			#endif
 			break;
 		default:
 			LOG_FATAL("Unhandled core scene state detected");	
@@ -65,9 +71,11 @@ void UpdateCoreScene() {
 }
 
 void InitializeCoreScene() {
+	#ifndef DEBUG_SINGLEPLAYER
 	// backup initialize connection
 	if (g_NetworkObject.m_Descriptor == CORE_IS_UNKNOWN)
 		CoreBackupNetworkSetup();
+	#endif
 
 	// initialize camera
     g_Camera.target = (Vector2){ g_PlayerLocation.x + g_PlayerSize.x/2.0f, g_PlayerLocation.y + g_PlayerSize.y/2.0f };

@@ -1,7 +1,9 @@
 MINOR:
     - polish graphics
 	- smooth camera binding
-	- network speed monitor
+	- queued movement
+	- tilemap collision - "map" structs that hold info e.g. a "collision map" that holds coordinates on what tiles (maybe even of what varying size) that are collision
+	- projectile collision
 
 MEDIUM:
     - connect to client via start scene
@@ -18,3 +20,4 @@ COMPLETED:
 	- basic setup
 	- include raylib
 	- include easynet
+	- network speed monitor

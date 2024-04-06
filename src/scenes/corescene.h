@@ -1,5 +1,5 @@
-#ifndef CORESCENE 
-#define CORESCENE 
+#ifndef CORESCENE_H
+#define CORESCENE_H
 
 #include "utils/datastructs.h"
 #include "easynet.h"

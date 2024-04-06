@@ -1,5 +1,5 @@
-#ifndef TIMEUTILS
-#define TIMEUTILS
+#ifndef TIMEUTILS_H
+#define TIMEUTILS_H
 
 #include <stdint.h>
 

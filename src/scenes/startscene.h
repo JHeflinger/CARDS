@@ -1,5 +1,5 @@
-#ifndef STARTSCENE 
-#define STARTSCENE 
+#ifndef STARTSCENE_H
+#define STARTSCENE_H
 
 void DrawStartScene();
 void UpdateStartScene();

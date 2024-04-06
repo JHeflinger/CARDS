@@ -1,5 +1,5 @@
-#ifndef GAME 
-#define GAME
+#ifndef GAME_H 
+#define GAME_H
 
 typedef enum {
     TITLE,

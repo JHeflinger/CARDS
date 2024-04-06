@@ -1,5 +1,5 @@
-#ifndef DATASTRUCTS
-#define DATASTRUCTS
+#ifndef DATASTRUCTS_H
+#define DATASTRUCTS_H
 
 #include "core/logger.h"
 #include "easynet.h"
