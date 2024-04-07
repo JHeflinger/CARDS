@@ -1,6 +1,8 @@
 #include "corescene.h"
 #include "core/logger.h"
+#include "core/input.h"
 #include "utils/timeutils.h"
+#include "utils/numbers.h"
 #include "raylib.h"
 
 #define DEBUG_SINGLEPLAYER
@@ -13,7 +15,7 @@ Vector2               g_PlayerSize         = { 20.0f, 20.0f };
 
 // temp
 Vector2               g_EnemyLocation      = { 0 };
-uint32_t               g_Ping               = -1;
+uint32_t              g_Ping               = -1;
 
 void DrawCoreScene() {
     BeginDrawing();
@@ -88,21 +90,39 @@ void InitializeCoreScene() {
 }
 
 void MainCoreScene() {
-	// basic wasd movement
+	// update input modules
+	UpdateWASDQueue();
+
 	float ft = GetFrameTime();
-	float speed = 100;
-	if (IsKeyDown(KEY_W)) {
-		g_PlayerLocation.y -= speed*ft;
+	float speed = 800.0f;
+	Vector2 vel = { 0 };
+	switch (PeekWS()) {
+		case 'w':
+			vel.y = -1.0f;
+			break;
+		case 's':
+			vel.y = 1.0f;
+			break;
+		default:
+			vel.y = 0;
 	}
-	if (IsKeyDown(KEY_A)) {
-		g_PlayerLocation.x -= speed*ft;
+	switch (PeekAD()) {
+		case 'd':
+			vel.x = 1.0f;
+			break;
+		case 'a':
+			vel.x = -1.0f;
+			break;
+		default:
+			vel.x = 0;
 	}
-	if (IsKeyDown(KEY_S)) {
-		g_PlayerLocation.y += speed*ft;
+	if (vel.x != 0 && vel.y != 0) {
+		vel.x /= SQRT2;
+		vel.y /= SQRT2;
 	}
-	if (IsKeyDown(KEY_D)) {
-		g_PlayerLocation.x += speed*ft;
-	}
+
+	g_PlayerLocation.x += speed*ft*vel.x;
+	g_PlayerLocation.y += speed*ft*vel.y;
 
 	// update camera to bind to player 
 	g_Camera.target = (Vector2){ g_PlayerLocation.x + g_PlayerSize.x/2.0f, g_PlayerLocation.y + g_PlayerSize.y/2.0f };

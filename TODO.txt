@@ -1,7 +1,6 @@
 MINOR:
     - polish graphics
 	- smooth camera binding
-	- queued movement
 	- tilemap collision - "map" structs that hold info e.g. a "collision map" that holds coordinates on what tiles (maybe even of what varying size) that are collision
 	- projectile collision
 
@@ -21,3 +20,4 @@ COMPLETED:
 	- include raylib
 	- include easynet
 	- network speed monitor
+	- queued movement
