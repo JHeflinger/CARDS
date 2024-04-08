@@ -3,6 +3,9 @@
 #include "core/input.h"
 #include "utils/timeutils.h"
 #include "utils/numbers.h"
+#include "data/datamap.h"
+#include "data/collisionmap.h"
+#include "data/baked.h"
 #include "raylib.h"
 
 #define DEBUG_SINGLEPLAYER
