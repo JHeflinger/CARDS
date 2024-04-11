@@ -7,9 +7,11 @@
 #include "data/collisionmap.h"
 #include "data/baked.h"
 #include "raylib.h"
+#include <math.h>
 
 #define CELLSIZE 20 
 #define DEBUG_SINGLEPLAYER
+#define IOTA 0.0001f
 
 CoreSceneState        g_State              = CORE_NONE;
 CoreNetworkObject     g_NetworkObject      = { 0 };
@@ -21,6 +23,7 @@ CollisionMap*         g_CollisionMap       = NULL;
 // temp
 Vector2               g_EnemyLocation      = { 0 };
 uint32_t              g_Ping               = -1;
+int                   g_PlayerColliding    = 0;
 
 void DrawCoreScene() {
     BeginDrawing();
@@ -76,6 +79,8 @@ void DrawDevUI() {
 	DrawText(buffer, 10, 10, 18, RAYWHITE);
 	sprintf(buffer, "PING: %u", g_Ping);
 	DrawText(buffer, 10, 30, 18, RAYWHITE);
+	DrawText("COLLIDING", 10, 50, 18, g_PlayerColliding == 1 ? RED : GREEN);
+
 }
 
 void UpdateCoreScene() {
@@ -131,8 +136,9 @@ void MainCoreScene() {
 	// update input modules
 	UpdateWASDQueue();
 
+	// update velocity
 	float ft = GetFrameTime();
-	float speed = 800.0f;
+	float speed = 100.0f;
 	Vector2 vel = { 0 };
 	switch (PeekWS()) {
 		case 'w':
@@ -159,8 +165,29 @@ void MainCoreScene() {
 		vel.y /= SQRT2;
 	}
 
+	// process collision checking
+	Vector2 rollback = g_PlayerLocation;
 	g_PlayerLocation.x += speed*ft*vel.x;
 	g_PlayerLocation.y += speed*ft*vel.y;
+	g_PlayerColliding = 0;
+	Vector2 newloc = g_PlayerLocation;
+	for (int x = 0; x < 2; x++) {
+		for (int y = 0; y < 2; y++) {
+			int64_t coordx = (int64_t)floor(g_PlayerLocation.x / (float)CELLSIZE) - g_CollisionMap->x + x;
+			int64_t rollbx = (int64_t)floor(rollback.x / (float)CELLSIZE) - g_CollisionMap->x + x;
+			int64_t coordy = (int64_t)floor(g_PlayerLocation.y / (float)CELLSIZE) - g_CollisionMap->y + y;
+			int64_t rollby = (int64_t)floor(rollback.y / (float)CELLSIZE) - g_CollisionMap->y + y;
+			int xcol = coordx >= 0 && rollby >= 0 && coordx < g_CollisionMap->width && rollby < g_CollisionMap->height && g_CollisionMap->data[(size_t)coordx][(size_t)rollby] == 'B';
+			int ycol = rollbx >= 0 && coordy >= 0 && rollbx < g_CollisionMap->width && coordy < g_CollisionMap->height && g_CollisionMap->data[(size_t)rollbx][(size_t)coordy] == 'B';
+			int bcol = coordx >= 0 && coordy >= 0 && coordx < g_CollisionMap->width && coordy < g_CollisionMap->height && g_CollisionMap->data[(size_t)coordx][(size_t)coordy] == 'B';
+			g_PlayerColliding = g_PlayerColliding | xcol | ycol | bcol;
+			if (xcol && vel.x > 0) newloc.x = CELLSIZE*(coordx - x - g_CollisionMap->x) - IOTA;
+			if (xcol && vel.x < 0) newloc.x = CELLSIZE*(coordx - x - g_CollisionMap->x + 1) + IOTA;
+			if (ycol && vel.y > 0) newloc.y = CELLSIZE*(coordy - y - g_CollisionMap->y) - IOTA;
+			if (ycol && vel.y < 0) newloc.y = CELLSIZE*(coordy - y - g_CollisionMap->y + 1) + IOTA;
+		}
+	}
+	g_PlayerLocation = newloc;
 
 	// update camera to bind to player 
 	g_Camera.target = (Vector2){ g_PlayerLocation.x + g_PlayerSize.x/2.0f, g_PlayerLocation.y + g_PlayerSize.y/2.0f };
