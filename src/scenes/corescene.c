@@ -8,6 +8,7 @@
 #include "data/baked.h"
 #include "raylib.h"
 
+#define CELLSIZE 20 
 #define DEBUG_SINGLEPLAYER
 
 CoreSceneState        g_State              = CORE_NONE;
@@ -15,6 +16,7 @@ CoreNetworkObject     g_NetworkObject      = { 0 };
 Camera2D              g_Camera             = { 0 };
 Vector2               g_PlayerLocation     = { 0 };
 Vector2               g_PlayerSize         = { 20.0f, 20.0f };
+CollisionMap*         g_CollisionMap       = NULL;
 
 // temp
 Vector2               g_EnemyLocation      = { 0 };
@@ -45,11 +47,35 @@ void DrawCoreScene() {
 	Rectangle rec2 = { g_EnemyLocation.x, g_EnemyLocation.y, g_PlayerSize.x, g_PlayerSize.y};
 	DrawRectangleRec(rec2, RED);
 
+	DrawDevObjects();
+
 	EndMode2D();
 
-	CoreDevTrace();
+	DrawDevUI();
 
     EndDrawing();
+}
+
+void DrawDevObjects() {
+	if (g_CollisionMap != NULL) {
+		for (int y = 0; y < g_CollisionMap->height; y++) {
+			for (int x = 0; x < g_CollisionMap->width; x++) {
+				if (g_CollisionMap->data[x][y] == 'B') {
+					Rectangle hitbox = {x*CELLSIZE + g_CollisionMap->x*CELLSIZE, y*CELLSIZE + g_CollisionMap->y*CELLSIZE, CELLSIZE, CELLSIZE};
+					DrawRectangleRec(hitbox, GREEN);
+				}
+			}
+		}
+	}
+}
+
+void DrawDevUI() {
+	// fps monitor
+	char buffer[1024];
+	sprintf(buffer, "FPS: %d", (int)(1.0f/GetFrameTime()));
+	DrawText(buffer, 10, 10, 18, RAYWHITE);
+	sprintf(buffer, "PING: %u", g_Ping);
+	DrawText(buffer, 10, 30, 18, RAYWHITE);
 }
 
 void UpdateCoreScene() {
@@ -87,6 +113,15 @@ void InitializeCoreScene() {
     g_Camera.offset = (Vector2){ GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
     g_Camera.rotation = 0.0f;
     g_Camera.zoom = 1.0f;
+
+	// initialize collision map 
+	Datamap* coldata = GenerateDatamap(DEV_MAP);
+	g_CollisionMap = GenerateCollisionMap();
+	LoadCollisionChunk(g_CollisionMap, coldata);
+	FreeDatamap(coldata);
+	coldata = GenerateDatamap(DEV_MAP_2);
+	LoadCollisionChunk(g_CollisionMap, coldata);
+	FreeDatamap(coldata);
 
 	// change state
 	g_State = CORE_MAIN;
@@ -129,15 +164,6 @@ void MainCoreScene() {
 
 	// update camera to bind to player 
 	g_Camera.target = (Vector2){ g_PlayerLocation.x + g_PlayerSize.x/2.0f, g_PlayerLocation.y + g_PlayerSize.y/2.0f };
-}
-
-void CoreDevTrace() {
-	// fps monitor
-	char buffer[1024];
-	sprintf(buffer, "FPS: %d", (int)(1.0f/GetFrameTime()));
-	DrawText(buffer, 10, 10, 18, RAYWHITE);
-	sprintf(buffer, "PING: %u", g_Ping);
-	DrawText(buffer, 10, 30, 18, RAYWHITE);
 }
 
 void CoreBackupNetworkSetup() {
@@ -214,6 +240,10 @@ void UpdateCoreNetworkService() {
 		default:
 			LOG_FATAL("Invalid network status - cannot update network service");
 	}
+}
+
+void CleanCoreScene() {
+	FreeCollisionMap(g_CollisionMap);
 }
 
 EZN_STATUS ConnectAsClient(ezn_Client* client, EZN_SOCKET serversock) {

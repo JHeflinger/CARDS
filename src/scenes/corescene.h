@@ -26,13 +26,15 @@ typedef struct {
 } CoreNetworkObject;
 
 void DrawCoreScene();
+void DrawDevObjects();
+void DrawDevUI();
 void UpdateCoreScene();
 void InitializeCoreScene();
 void MainCoreScene();
-void CoreDevTrace();
 void CoreBackupNetworkSetup();
 void CheckCoreNetworkService();
 void UpdateCoreNetworkService();
+void CleanCoreScene();
 
 EZN_STATUS ConnectAsClient(ezn_Client* client, EZN_SOCKET serversock);
 EZN_STATUS HostAsServer(ezn_Server* server, EZN_SOCKET clientsock);

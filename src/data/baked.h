@@ -16,4 +16,18 @@ BB    B     \n\
           BB\n\
 "
 
+#define DEV_MAP_2 "\
+#TYPE COLLISION\n\
+#ORIGIN 2 8\n\
+#DATA\n\
+BBBBBBB   B \n\
+BBBBBBB   B \n\
+BB    B   B \n\
+BB    B     \n\
+BBBBBBB     \n\
+            \n\
+            \n\
+          BB\n\
+          BB\n\
+"
 #endif
