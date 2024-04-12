@@ -52,6 +52,8 @@ void DrawCoreScene() {
 	Rectangle rec2 = { g_EnemyLocation.x, g_EnemyLocation.y, g_PlayerSize.x, g_PlayerSize.y};
 	DrawRectangleRec(rec2, RED);
 
+	DrawProjectiles();
+
 	DrawDevObjects();
 
 	EndMode2D();
@@ -59,6 +61,14 @@ void DrawCoreScene() {
 	DrawDevUI();
 
     EndDrawing();
+}
+
+void DrawProjectiles() {
+	for (int i = 0; i < g_Projectiles.size; i++) {
+		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
+		Rectangle rec = { projectile->position.x, 0, 0, 0 };
+		/*DrawRectangleRec(rec, BLUE);*/
+	}
 }
 
 void DrawDevObjects() {
@@ -137,6 +147,37 @@ void InitializeCoreScene() {
 void MainCoreScene() {
 	// update input modules
 	UpdateSmartInput();
+
+	// fire projectiles
+	Vector2 projvelo = { 0 };
+	float projspeed = 100.0f;
+	switch (PeekIK()) {
+		case 'i':
+			projvelo.y = -1.0f;
+			break;
+		case 'k':
+			projvelo.y = 1.0f;
+			break;
+		default:
+			projvelo.y = 0.0f;
+	}
+	switch (PeekJL()) {
+		case 'j':
+			projvelo.x = -1.0f;
+			break;
+		case 'l':
+			projvelo.x = 1.0f;
+			break;
+		default:
+			projvelo.x = 0.0f;
+	}
+	if (projvelo.x != 0 || projvelo.y != 0) {
+		LOG_WARN("huh??");
+		projvelo.x *= projspeed;
+		projvelo.y *= projspeed;
+		Projectile* projectile = GenerateDefaultProjectile(g_PlayerLocation, projvelo);
+		ARRLIST_ProjectilePtr_add(&g_Projectiles, projectile);
+	}
 
 	// update velocity
 	float ft = GetFrameTime();

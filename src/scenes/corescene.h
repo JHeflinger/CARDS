@@ -26,6 +26,7 @@ typedef struct {
 } CoreNetworkObject;
 
 void DrawCoreScene();
+void DrawProjectiles();
 void DrawDevObjects();
 void DrawDevUI();
 void UpdateCoreScene();
