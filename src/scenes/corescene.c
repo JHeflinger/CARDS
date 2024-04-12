@@ -20,8 +20,9 @@ Camera2D              g_Camera             = { 0 };
 Vector2               g_PlayerLocation     = { 0 };
 Vector2               g_PlayerSize         = { 20.0f, 20.0f };
 CollisionMap*         g_CollisionMap       = NULL;
+ARRLIST_ProjectilePtr g_Projectiles        = { 0 };
 
-// temp
+// temp?
 Vector2               g_EnemyLocation      = { 0 };
 uint32_t              g_Ping               = -1;
 int                   g_PlayerColliding    = 0;

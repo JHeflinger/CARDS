@@ -14,4 +14,4 @@ IMPL_ARRLIST(int16_t);
 IMPL_ARRLIST(int32_t);
 IMPL_ARRLIST(int64_t);
 IMPL_ARRLIST(EZN_SOCKET);
-IMPL_ARRLIST(Projectile);
+IMPL_ARRLIST_NAMED(ProjectilePtr, Projectile*);
