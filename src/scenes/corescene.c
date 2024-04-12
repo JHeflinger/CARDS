@@ -6,6 +6,7 @@
 #include "data/datamap.h"
 #include "data/collisionmap.h"
 #include "data/baked.h"
+#include "objects/projectile.h"
 #include "raylib.h"
 #include <math.h>
 
