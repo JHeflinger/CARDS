@@ -18,7 +18,7 @@ CoreSceneState        g_State              = CORE_NONE;
 CoreNetworkObject     g_NetworkObject      = { 0 };
 Camera2D              g_Camera             = { 0 };
 Vector2               g_PlayerLocation     = { 0 };
-Vector2               g_PlayerSize         = { 20.0f, 20.0f };
+Vector2               g_PlayerSize         = { CELLSIZE, CELLSIZE };
 CollisionMap*         g_CollisionMap       = NULL;
 ARRLIST_ProjectilePtr g_Projectiles        = { 0 };
 
@@ -37,7 +37,7 @@ void DrawCoreScene() {
 	Rectangle b1 = {10, 10, 100, 200};
 	DrawRectangleRec(b1, BLUE);
 
-	int stepsize = 20;
+	int stepsize = CELLSIZE;
 	int gridsize = 100;
 	for (int i = 0; i < gridsize; i++) {
 		DrawLine(-1*i*stepsize, -1*gridsize*stepsize, -1*i*stepsize, gridsize*stepsize, LIGHTGRAY);
@@ -136,11 +136,11 @@ void InitializeCoreScene() {
 
 void MainCoreScene() {
 	// update input modules
-	UpdateWASDQueue();
+	UpdateSmartInput();
 
 	// update velocity
 	float ft = GetFrameTime();
-	float speed = 100.0f;
+	float speed = CELLSIZE * 10;
 	Vector2 vel = { 0 };
 	switch (PeekWS()) {
 		case 'w':
