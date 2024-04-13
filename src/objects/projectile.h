@@ -21,11 +21,11 @@ typedef struct {
 	Vector2 size;
 	float rotation;
 	float lifetime;
-	//ProjectileBehavior on_spawn;
-	//ProjectileBehavior on_update;
-	//ProjectileBehavior on_collision;
-	//ProjectileBehavior on_hit;
-	//ProjectileBehavior on_death;
+	ProjectileBehavior on_spawn;
+	ProjectileBehavior on_update;
+	ProjectileBehavior on_collision;
+	ProjectileBehavior on_hit;
+	ProjectileBehavior on_death;
 	ProjectileFlag enable_flags;
 } Projectile;
 

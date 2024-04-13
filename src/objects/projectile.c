@@ -1,4 +1,5 @@
 #include "projectile.h"
+#include <stdlib.h>
 
 Projectile* GenerateDefaultProjectile(Vector2 position, Vector2 velocity) {
 	Projectile* projectile = calloc(1, sizeof(Projectile));

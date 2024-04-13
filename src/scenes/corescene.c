@@ -64,8 +64,13 @@ void DrawCoreScene() {
 }
 
 void DrawProjectiles() {
-	for (int i = 0; i < g_Projectiles.size; i++) {
-		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
+	for (size_t i = 0; i < (int)g_Projectiles.size; i++) {
+		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, (size_t)i);
+		if (projectile == NULL) {
+			LOG_INFO("what? %d", (int)g_Projectiles.size);
+			LOG_WARN("uhoh %d", i + 1);
+		}
+		LOG_INFO("%p", projectile);
 		Rectangle rec = { projectile->position.x, 0, 0, 0 };
 		/*DrawRectangleRec(rec, BLUE);*/
 	}
