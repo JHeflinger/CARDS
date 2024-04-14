@@ -121,7 +121,27 @@ void UpdateCoreScene() {
 void UpdateProjectiles() {
 	for (size_t i = 0; i < g_Projectiles.size; i++) {
 		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
+		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_SPAWN) {
+			projectile->enable_flags = projectile->enable_flags ^ ENABLE_PROJECTILE_ON_SPAWN;
+			projectile->on_spawn(NULL, 0);
+		} 
+		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_UPDATE) {
+			projectile->on_update(NULL, 0);
+		} 
+		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_COLLISION) {
+			int collided = 0;
+			// TODO
+			LOG_WARN("Projectile collision is not implemented yet!");
+			if (collided)
+				projectile->on_collision(NULL, 0);
+		} 
+		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_HIT) {
+			LOG_WARN("Projectile on-hit is not implemented yet!"); //TODO
+		}
 		if (projectile->lifetime <= 0) {
+			if (projectile->enable_flags & ENABLE_PROJECTILE_ON_DEATH) {
+				projectile->on_death(NULL, 0);
+			}
 			ARRLIST_ProjectilePtr_remove(&g_Projectiles, i);
 			free(projectile);
 			i--;

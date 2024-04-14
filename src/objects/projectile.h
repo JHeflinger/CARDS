@@ -7,12 +7,12 @@
 typedef void (*ProjectileBehavior)(void*, size_t); // return: void | void* parameters | size_t num args
 
 typedef enum {
-	ENABLE_PROJECTILE_NONE,
-	ENABLE_PROJECTILE_ON_SPAWN,
-	ENABLE_PROJECTILE_ON_UPDATE,
-	ENABLE_PROJECTILE_ON_COLLISION,
-	ENABLE_PROJECTILE_ON_HIT,
-	ENABLE_PROJECTILE_ON_DEATH
+	ENABLE_PROJECTILE_NONE          = 1 << 0,
+	ENABLE_PROJECTILE_ON_SPAWN      = 1 << 1,
+	ENABLE_PROJECTILE_ON_UPDATE     = 1 << 2,
+	ENABLE_PROJECTILE_ON_COLLISION  = 1 << 3,
+	ENABLE_PROJECTILE_ON_HIT        = 1 << 4,
+	ENABLE_PROJECTILE_ON_DEATH      = 1 << 5
 } ProjectileFlag;
 
 typedef struct {
