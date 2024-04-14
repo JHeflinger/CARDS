@@ -36,6 +36,7 @@ void ARRLIST_##T##_add(ARRLIST_##T* list, T element) { \
 		memcpy(newdata, list->data, sizeof(T)*list->size); \
 		free(list->data); \
 		list->data = newdata; \
+		list->data[list->size] = element; \
 		list->size++; \
 	} \
 } \
@@ -43,7 +44,12 @@ void ARRLIST_##T##_add(ARRLIST_##T* list, T element) { \
 void ARRLIST_##T##_remove(ARRLIST_##T* list, size_t index) { \
 	if (index >= list->size) \
 		LOG_FATAL("Invalid arraylist index to remove"); \
-	memcpy(list->data + (sizeof(T)*index), list->data + (sizeof(T)*(index + 1)), sizeof(T)*(list->size - index - 1)); \
+	if (index == list->size - 1)  { \
+		list->size--; \
+		return; \
+	} \
+	for (size_t i = index; i < list->size - 1; i++) \
+		list->data[i] = list->data[i + 1]; \
 	list->size--; \
 } \
 \
@@ -87,6 +93,7 @@ void ARRLIST_##name##_add(ARRLIST_##name* list, T element) { \
 		memcpy(newdata, list->data, sizeof(T)*list->size); \
 		free(list->data); \
 		list->data = newdata; \
+		list->data[list->size] = element; \
 		list->size++; \
 	} \
 } \
@@ -94,7 +101,12 @@ void ARRLIST_##name##_add(ARRLIST_##name* list, T element) { \
 void ARRLIST_##name##_remove(ARRLIST_##name* list, size_t index) { \
 	if (index >= list->size) \
 		LOG_FATAL("Invalid arraylist index to remove"); \
-	memcpy(list->data + (sizeof(T)*index), list->data + (sizeof(T)*(index + 1)), sizeof(T)*(list->size - index - 1)); \
+	if (index == list->size - 1)  { \
+		list->size--; \
+		return; \
+	} \
+	for (size_t i = index; i < list->size - 1; i++) \
+		list->data[i] = list->data[i + 1]; \
 	list->size--; \
 } \
 \

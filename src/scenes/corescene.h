@@ -30,6 +30,7 @@ void DrawProjectiles();
 void DrawDevObjects();
 void DrawDevUI();
 void UpdateCoreScene();
+void UpdateProjectiles();
 void InitializeCoreScene();
 void MainCoreScene();
 void CoreBackupNetworkSetup();

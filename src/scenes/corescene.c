@@ -64,15 +64,10 @@ void DrawCoreScene() {
 }
 
 void DrawProjectiles() {
-	for (size_t i = 0; i < (int)g_Projectiles.size; i++) {
-		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, (size_t)i);
-		if (projectile == NULL) {
-			LOG_INFO("what? %d", (int)g_Projectiles.size);
-			LOG_WARN("uhoh %d", i + 1);
-		}
-		LOG_INFO("%p", projectile);
-		Rectangle rec = { projectile->position.x, 0, 0, 0 };
-		/*DrawRectangleRec(rec, BLUE);*/
+	for (size_t i = 0; i < g_Projectiles.size; i++) {
+		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
+		Rectangle rec = { projectile->position.x, projectile->position.y, projectile->size.x, projectile->size.y };
+		DrawRectangleRec(rec, BLUE);
 	}
 }
 
@@ -120,6 +115,22 @@ void UpdateCoreScene() {
 			break;
 		default:
 			LOG_FATAL("Unhandled core scene state detected");	
+	}
+}
+
+void UpdateProjectiles() {
+	for (size_t i = 0; i < g_Projectiles.size; i++) {
+		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
+		if (projectile->lifetime <= 0) {
+			ARRLIST_ProjectilePtr_remove(&g_Projectiles, i);
+			free(projectile);
+			i--;
+		} else {
+			float ft = GetFrameTime();
+			projectile->lifetime -= ft;
+			projectile->position.x += ft*projectile->velocity.x;
+			projectile->position.y += ft*projectile->velocity.y;
+		}
 	}
 }
 
@@ -177,7 +188,6 @@ void MainCoreScene() {
 			projvelo.x = 0.0f;
 	}
 	if (projvelo.x != 0 || projvelo.y != 0) {
-		LOG_WARN("huh??");
 		projvelo.x *= projspeed;
 		projvelo.y *= projspeed;
 		Projectile* projectile = GenerateDefaultProjectile(g_PlayerLocation, projvelo);
@@ -236,6 +246,9 @@ void MainCoreScene() {
 		}
 	}
 	g_PlayerLocation = newloc;
+
+	// update projectiles
+	UpdateProjectiles();
 
 	// update camera to bind to player 
 	g_Camera.target = (Vector2){ g_PlayerLocation.x + g_PlayerSize.x/2.0f, g_PlayerLocation.y + g_PlayerSize.y/2.0f };
