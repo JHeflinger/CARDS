@@ -6,13 +6,10 @@
 #include "data/datamap.h"
 #include "data/collisionmap.h"
 #include "data/baked.h"
+#include "data/gconfig.h"
 #include "objects/projectile.h"
 #include "raylib.h"
 #include <math.h>
-
-#define CELLSIZE 20 
-#define DEBUG_SINGLEPLAYER
-#define IOTA 0.0001f
 
 CoreSceneState        g_State              = CORE_NONE;
 CoreNetworkObject     g_NetworkObject      = { 0 };
@@ -119,45 +116,98 @@ void UpdateCoreScene() {
 }
 
 void UpdateProjectiles() {
+	float ft = GetFrameTime();
 	for (size_t i = 0; i < g_Projectiles.size; i++) {
 		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
 		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_SPAWN) {
 			projectile->enable_flags = projectile->enable_flags ^ ENABLE_PROJECTILE_ON_SPAWN;
-			projectile->on_spawn(NULL, 0);
+			projectile->on_spawn(projectile);
 		} 
 		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_UPDATE) {
-			projectile->on_update(NULL, 0);
+			projectile->on_update(projectile);
 		} 
 		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_COLLISION) {
 			int collided = 0;
-			int64_t ocoord_x = (int64_t)floor(projectile->position.x / (float)CELLSIZE);
-			int64_t ocoord_y = (int64_t)floor(projectile->position.y / (float)CELLSIZE);
+			Vector2 collision_descriptor = { 0 };
+
+			// possible collision coordinates
+			int64_t collision_coord_x = 0;
+			int64_t collision_coord_y = 0;
+
+			// setup cell coordinates
+			int64_t ocoord_x = (int64_t)floor((projectile->position.x) / (float)CELLSIZE);
+			int64_t ocoord_y = (int64_t)floor((projectile->position.y) / (float)CELLSIZE);
 			int64_t ocoord_w = (int64_t)floor((projectile->position.x + projectile->size.x) / (float)CELLSIZE);
 			int64_t ocoord_h = (int64_t)floor((projectile->position.y + projectile->size.y) / (float)CELLSIZE);
+			
+			// check for general collision
 			for (int64_t x = ocoord_x; x <= ocoord_w && collided == 0; x++) {
 				for (int64_t y = ocoord_y; y <= ocoord_h && collided == 0; y++) {
 					int64_t cell_x = x - g_CollisionMap->x;
 					int64_t cell_y = y - g_CollisionMap->y;
-					if (cell_x >= 0 && cell_y >= 0 && cell_x < g_CollisionMap->width && cell_y < g_CollisionMap->height && g_CollisionMap->data[(size_t)cell_x][(size_t)cell_y] == 'B')
+					if (cell_x >= 0 && 
+						cell_y >= 0 && 
+						cell_x < g_CollisionMap->width && 
+						cell_y < g_CollisionMap->height && 
+						g_CollisionMap->data[(size_t)cell_x][(size_t)cell_y] == 'B') {
 						collided = 1;
+						collision_coord_x = x;
+						collision_coord_y = y;
+					}
 				}
 			}
-			if (collided) 
-				projectile->on_collision(NULL, 0);
+
+			if (collided) {
+				// setup cell coordinates
+				int64_t old_ocoord_x = (int64_t)floor((projectile->prev_position.x) / (float)CELLSIZE);
+				int64_t old_ocoord_y = (int64_t)floor((projectile->prev_position.y) / (float)CELLSIZE);
+				int64_t old_ocoord_w = (int64_t)floor((projectile->prev_position.x + projectile->size.x) / (float)CELLSIZE);
+				int64_t old_ocoord_h = (int64_t)floor((projectile->prev_position.y + projectile->size.y) / (float)CELLSIZE);
+
+				// check for ycol
+				for (int64_t x = old_ocoord_x; x <= old_ocoord_w && collision_descriptor.y == 0; x++) {
+					for (int64_t y = ocoord_y; y <= ocoord_h && collision_descriptor.y == 0; y++) {
+						int64_t cell_x = x - g_CollisionMap->x;
+						int64_t cell_y = y - g_CollisionMap->y;
+						if (cell_x >= 0 && 
+							cell_y >= 0 && 
+							cell_x < g_CollisionMap->width && 
+							cell_y < g_CollisionMap->height && 
+							g_CollisionMap->data[(size_t)cell_x][(size_t)cell_y] == 'B')
+							collision_descriptor.y = projectile->velocity.y > 0 ? 1.0f : -1.0f;
+					}
+				}
+
+				// check for xcol
+				for (int64_t x = ocoord_x; x <= ocoord_w && collision_descriptor.x == 0; x++) {
+					for (int64_t y = old_ocoord_y; y <= old_ocoord_h && collision_descriptor.x == 0; y++) {
+						int64_t cell_x = x - g_CollisionMap->x;
+						int64_t cell_y = y - g_CollisionMap->y;
+						if (cell_x >= 0 && 
+							cell_y >= 0 && 
+							cell_x < g_CollisionMap->width && 
+							cell_y < g_CollisionMap->height && 
+							g_CollisionMap->data[(size_t)cell_x][(size_t)cell_y] == 'B')
+							collision_descriptor.x = projectile->velocity.x > 0 ? 1.0f : -1.0f;
+					}
+				}
+
+				projectile->on_collision(projectile, collision_descriptor, collision_coord_x, collision_coord_y);
+			}
 		} 
 		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_HIT) {
 			LOG_WARN("Projectile on-hit is not implemented yet!"); //TODO
 		}
 		if (projectile->lifetime <= 0) {
 			if (projectile->enable_flags & ENABLE_PROJECTILE_ON_DEATH) {
-				projectile->on_death(NULL, 0);
+				projectile->on_death(projectile);
 			}
 			ARRLIST_ProjectilePtr_remove(&g_Projectiles, i);
 			free(projectile);
 			i--;
 		} else {
-			float ft = GetFrameTime();
 			projectile->lifetime -= ft;
+			projectile->prev_position = projectile->position;
 			projectile->position.x += ft*projectile->velocity.x;
 			projectile->position.y += ft*projectile->velocity.y;
 		}
@@ -220,7 +270,7 @@ void MainCoreScene() {
 	if (projvelo.x != 0 || projvelo.y != 0) {
 		projvelo.x *= projspeed;
 		projvelo.y *= projspeed;
-		Projectile* projectile = GenerateDefaultProjectile(g_PlayerLocation, projvelo);
+		Projectile* projectile = GenerateBouncyProjectile(g_PlayerLocation, projvelo);
 		ARRLIST_ProjectilePtr_add(&g_Projectiles, projectile);
 	}
 

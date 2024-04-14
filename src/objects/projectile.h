@@ -3,8 +3,10 @@
 
 #include "raylib.h"
 #include <stdlib.h>
+#include <stdint.h>
 
-typedef void (*ProjectileBehavior)(void*, size_t); // return: void | void* parameters | size_t num args
+typedef void (*ProjectileBehavior)(void*); // void* projectile
+typedef void (*ProjectileCollisionBehavior)(void*, Vector2, int64_t, int64_t); // void* projectile | Vector2 collision_descriptor | int collision_coordinate_x | int collision_coordinate_y
 
 typedef enum {
 	ENABLE_PROJECTILE_NONE          = 1 << 0,
@@ -16,6 +18,7 @@ typedef enum {
 } ProjectileFlag;
 
 typedef struct {
+	Vector2 prev_position;
 	Vector2 position;
 	Vector2 velocity;
 	Vector2 size;
@@ -23,12 +26,13 @@ typedef struct {
 	float lifetime;
 	ProjectileBehavior on_spawn;
 	ProjectileBehavior on_update;
-	ProjectileBehavior on_collision;
+	ProjectileCollisionBehavior on_collision;
 	ProjectileBehavior on_hit;
 	ProjectileBehavior on_death;
 	ProjectileFlag enable_flags;
 } Projectile;
 
 Projectile* GenerateDefaultProjectile(Vector2 position, Vector2 velocity);
+Projectile* GenerateBouncyProjectile(Vector2 position, Vector2 velocity);
 
 #endif
