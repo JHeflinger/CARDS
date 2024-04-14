@@ -52,9 +52,9 @@ void DrawCoreScene() {
 	Rectangle rec2 = { g_EnemyLocation.x, g_EnemyLocation.y, g_PlayerSize.x, g_PlayerSize.y};
 	DrawRectangleRec(rec2, RED);
 
-	DrawProjectiles();
-
 	DrawDevObjects();
+
+	DrawProjectiles();
 
 	EndMode2D();
 
@@ -130,9 +130,19 @@ void UpdateProjectiles() {
 		} 
 		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_COLLISION) {
 			int collided = 0;
-			// TODO
-			LOG_WARN("Projectile collision is not implemented yet!");
-			if (collided)
+			int64_t ocoord_x = (int64_t)floor(projectile->position.x / (float)CELLSIZE);
+			int64_t ocoord_y = (int64_t)floor(projectile->position.y / (float)CELLSIZE);
+			int64_t ocoord_w = (int64_t)floor((projectile->position.x + projectile->size.x) / (float)CELLSIZE);
+			int64_t ocoord_h = (int64_t)floor((projectile->position.y + projectile->size.y) / (float)CELLSIZE);
+			for (int64_t x = ocoord_x; x <= ocoord_w && collided == 0; x++) {
+				for (int64_t y = ocoord_y; y <= ocoord_h && collided == 0; y++) {
+					int64_t cell_x = x - g_CollisionMap->x;
+					int64_t cell_y = y - g_CollisionMap->y;
+					if (cell_x >= 0 && cell_y >= 0 && cell_x < g_CollisionMap->width && cell_y < g_CollisionMap->height && g_CollisionMap->data[(size_t)cell_x][(size_t)cell_y] == 'B')
+						collided = 1;
+				}
+			}
+			if (collided) 
 				projectile->on_collision(NULL, 0);
 		} 
 		if (projectile->enable_flags & ENABLE_PROJECTILE_ON_HIT) {
