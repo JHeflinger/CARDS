@@ -322,10 +322,10 @@ void MainCoreScene() {
 			int ycol = rollbx >= 0 && coordy >= 0 && rollbx < g_CollisionMap->width && coordy < g_CollisionMap->height && g_CollisionMap->data[(size_t)rollbx][(size_t)coordy] == 'B';
 			int bcol = coordx >= 0 && coordy >= 0 && coordx < g_CollisionMap->width && coordy < g_CollisionMap->height && g_CollisionMap->data[(size_t)coordx][(size_t)coordy] == 'B';
 			g_PlayerColliding = g_PlayerColliding | xcol | ycol | bcol;
-			if (xcol && vel.x > 0) newloc.x = CELLSIZE*(coordx - x - g_CollisionMap->x) - IOTA;
-			if (xcol && vel.x < 0) newloc.x = CELLSIZE*(coordx - x - g_CollisionMap->x + 1) + IOTA;
-			if (ycol && vel.y > 0) newloc.y = CELLSIZE*(coordy - y - g_CollisionMap->y) - IOTA;
-			if (ycol && vel.y < 0) newloc.y = CELLSIZE*(coordy - y - g_CollisionMap->y + 1) + IOTA;
+			if (xcol && vel.x > 0) newloc.x = (float)(CELLSIZE*(coordx - ((int64_t)x) + ((int64_t)g_CollisionMap->x)) - IOTA);
+			if (xcol && vel.x < 0) newloc.x = (float)(CELLSIZE*(coordx - ((int64_t)x) + ((int64_t)g_CollisionMap->x + 1)) + IOTA);
+			if (ycol && vel.y > 0) newloc.y = (float)(CELLSIZE*(coordy - ((int64_t)y) + ((int64_t)g_CollisionMap->y)) - IOTA);
+			if (ycol && vel.y < 0) newloc.y = (float)(CELLSIZE*(coordy - ((int64_t)y) + ((int64_t)g_CollisionMap->y + 1)) + IOTA);
 		}
 	}
 	g_PlayerLocation = newloc;
