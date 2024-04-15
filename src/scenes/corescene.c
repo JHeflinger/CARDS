@@ -31,25 +31,13 @@ void DrawCoreScene() {
     
 	BeginMode2D(g_Camera);
 
-	Rectangle b1 = {10, 10, 100, 200};
-	DrawRectangleRec(b1, BLUE);
-
-	int stepsize = CELLSIZE;
-	int gridsize = 100;
-	for (int i = 0; i < gridsize; i++) {
-		DrawLine(-1*i*stepsize, -1*gridsize*stepsize, -1*i*stepsize, gridsize*stepsize, LIGHTGRAY);
-		DrawLine(i*stepsize, -1*gridsize*stepsize, i*stepsize, gridsize*stepsize, LIGHTGRAY);
-		DrawLine(-1*gridsize*stepsize, i*stepsize, gridsize*stepsize, i*stepsize, LIGHTGRAY);
-		DrawLine(-1*gridsize*stepsize, -1*i*stepsize, gridsize*stepsize, -1*i*stepsize, LIGHTGRAY);
-	}
+	DrawDevObjects();
 
 	Rectangle rec = {g_PlayerLocation.x, g_PlayerLocation.y, g_PlayerSize.x, g_PlayerSize.y};
 	DrawRectangleRec(rec, GOLD);
 
 	Rectangle rec2 = { g_EnemyLocation.x, g_EnemyLocation.y, g_PlayerSize.x, g_PlayerSize.y};
 	DrawRectangleRec(rec2, RED);
-
-	DrawDevObjects();
 
 	DrawProjectiles();
 
@@ -64,11 +52,22 @@ void DrawProjectiles() {
 	for (size_t i = 0; i < g_Projectiles.size; i++) {
 		Projectile* projectile = ARRLIST_ProjectilePtr_get(&g_Projectiles, i);
 		Rectangle rec = { projectile->position.x, projectile->position.y, projectile->size.x, projectile->size.y };
-		DrawRectangleRec(rec, BLUE);
+		DrawRectangleRec(rec, PURPLE);
 	}
 }
 
 void DrawDevObjects() {
+	// draw grid
+	int stepsize = CELLSIZE;
+	int gridsize = 100;
+	for (int i = 0; i < gridsize; i++) {
+		DrawLine(-1*i*stepsize, -1*gridsize*stepsize, -1*i*stepsize, gridsize*stepsize, LIGHTGRAY);
+		DrawLine(i*stepsize, -1*gridsize*stepsize, i*stepsize, gridsize*stepsize, LIGHTGRAY);
+		DrawLine(-1*gridsize*stepsize, i*stepsize, gridsize*stepsize, i*stepsize, LIGHTGRAY);
+		DrawLine(-1*gridsize*stepsize, -1*i*stepsize, gridsize*stepsize, -1*i*stepsize, LIGHTGRAY);
+	}
+
+	// draw collision boxes
 	if (g_CollisionMap != NULL) {
 		for (int y = 0; y < g_CollisionMap->height; y++) {
 			for (int x = 0; x < g_CollisionMap->width; x++) {
@@ -86,9 +85,13 @@ void DrawDevUI() {
 	char buffer[1024];
 	sprintf(buffer, "FPS: %d", (int)(1.0f/GetFrameTime()));
 	DrawText(buffer, 10, 10, 18, RAYWHITE);
+
+	//ping monitor
 	sprintf(buffer, "PING: %u", g_Ping);
 	DrawText(buffer, 10, 30, 18, RAYWHITE);
-	DrawText("COLLIDING", 10, 50, 18, g_PlayerColliding == 1 ? RED : GREEN);
+
+	// player collision monitor
+	DrawText(g_PlayerColliding == 1 ? "COLLIDING" : "NOT COLLIDING", 10, 50, 18, g_PlayerColliding == 1 ? RED : GREEN);
 
 }
 
@@ -228,13 +231,13 @@ void InitializeCoreScene() {
     g_Camera.zoom = 1.0f;
 
 	// initialize collision map 
-	Datamap* coldata = GenerateDatamap(DEV_MAP);
+	Datamap* coldata = GenerateDatamap(TANKS_MAP);
 	g_CollisionMap = GenerateCollisionMap();
 	LoadCollisionChunk(g_CollisionMap, coldata);
 	FreeDatamap(coldata);
-	coldata = GenerateDatamap(DEV_MAP_2);
-	LoadCollisionChunk(g_CollisionMap, coldata);
-	FreeDatamap(coldata);
+	//coldata = GenerateDatamap(DEV_MAP_2);
+	//LoadCollisionChunk(g_CollisionMap, coldata);
+	//FreeDatamap(coldata);
 
 	// change state
 	g_State = CORE_MAIN;

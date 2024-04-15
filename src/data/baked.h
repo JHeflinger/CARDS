@@ -30,4 +30,27 @@ BBBBBBB     \n\
           BB\n\
           BB\n\
 "
+
+#define TANKS_MAP "\
+#TYPE COLLISION\n\
+#ORIGIN -12 -8\n\
+#DATA\n\
+BBBBBBBBBBBBBBBBBBBBBBBBB\n\
+B                       B\n\
+B                       B\n\
+B   B    BBBBBBB    B   B\n\
+B   B               B   B\n\
+B   BB             BB   B\n\
+B    B             B    B\n\
+B    B             B    B\n\
+B    B             B    B\n\
+B    B             B    B\n\
+B    B             B    B\n\
+B   BB             BB   B\n\
+B   B               B   B\n\
+B   B    BBBBBBB    B   B\n\
+B                       B\n\
+B                       B\n\
+BBBBBBBBBBBBBBBBBBBBBBBBB\n\
+"
 #endif
